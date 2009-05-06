@@ -1,7 +1,7 @@
 /*
- * Pixastic Lib - Brightness/Contrast filter - v0.1.0
+ * Pixastic Lib - Brightness/Contrast filter - v0.1.1
  * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
- * MIT License [http://www.opensource.org/licenses/mit-license.php]
+ * License: [http://www.pixastic.com/lib/license.txt]
  */
 
 Pixastic.Actions.brightness = {
@@ -24,43 +24,51 @@ Pixastic.Actions.brightness = {
 			var rect = params.options.rect;
 			var w = rect.width;
 			var h = rect.height;
-			var w4 = w*4;
-			var y = h;
-			do {
-				var offsetY = (y-1)*w4;
-				var x = w;
-				do {
-					var offset = offsetY + (x-1)*4;
 
-					if (legacy) {
-						var r = data[offset] + brightness;
-						var g = data[offset+1] + brightness;
-						var b = data[offset+2] + brightness;
-					} else {
-						var r = data[offset] * brightMul;
-						var g = data[offset+1] * brightMul;
-						var b = data[offset+2] * brightMul;
-					}
+			var p = w*h;
+			var pix = p*4, pix1, pix2;
 
-					if (contrast != 1) {
-						r = (r - 128) * contrast + 128;
-						g = (g - 128) * contrast + 128;
-						b = (b - 128) * contrast + 128;
-					}
+			var mul, add;
+			if (contrast != 1) {
+				if (legacy) {
+					mul = contrast;
+					add = (brightness - 128) * contrast + 128;
+				} else {
+					mul = brightMul * contrast;
+					add = - contrast * 128 + 128;
+				}
+			} else {  // this if-then is not necessary anymore, is it?
+				if (legacy) {
+					mul = 1;
+					add = brightness;
+				} else {
+					mul = brightMul;
+					add = 0;
+				}
+			}
+			var r, g, b;
+			while (p--) {
+				if ((r = data[pix-=4] * mul + add) > 255 )
+					data[pix] = 255;
+				else if (r < 0)
+					data[pix] = 0;
+				else
+ 					data[pix] = r;
 
-					if (r < 0 ) r = 0;
-					if (g < 0 ) g = 0;
-					if (b < 0 ) b = 0;
-					if (r > 255 ) r = 255;
-					if (g > 255 ) g = 255;
-					if (b > 255 ) b = 255;
+				if ((g = data[pix1=pix+1] * mul + add) > 255 ) 
+					data[pix1] = 255;
+				else if (g < 0)
+					data[pix1] = 0;
+				else
+					data[pix1] = g;
 
-					data[offset] = r;
-					data[offset+1] = g;
-					data[offset+2] = b;
-
-				} while (--x);
-			} while (--y);
+				if ((b = data[pix2=pix+2] * mul + add) > 255 ) 
+					data[pix2] = 255;
+				else if (b < 0)
+					data[pix2] = 0;
+				else
+					data[pix2] = b;
+			}
 			return true;
 		}
 	},

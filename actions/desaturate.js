@@ -1,7 +1,7 @@
 /*
- * Pixastic Lib - Desaturation filter - v0.1.0
+ * Pixastic Lib - Desaturation filter - v0.1.1
  * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
- * MIT License [http://www.opensource.org/licenses/mit-license.php]
+ * License: [http://www.pixastic.com/lib/license.txt]
  */
 
 Pixastic.Actions.desaturate = {
@@ -14,19 +14,17 @@ Pixastic.Actions.desaturate = {
 			var rect = params.options.rect;
 			var w = rect.width;
 			var h = rect.height;
-			var w4 = w*4;
-			var y = h;
-			do {
-				var offsetY = (y-1)*w4;
-				var x = w;
-				do {
-					var offset = offsetY + (x-1)*4;
-					var brightness = useAverage ?
-						(data[offset]+data[offset+1]+data[offset+2])/3
-						: (data[offset]*0.3 + data[offset+1]*0.59 + data[offset+2]*0.11);
-					data[offset] = data[offset+1] = data[offset+2] = brightness;
-				} while (--x);
-			} while (--y);
+
+			var p = w*h;
+			var pix = p*4, pix1, pix2;
+
+			if (useAverage) {
+				while (p--) 
+					data[pix-=4] = data[pix1=pix+1] = data[pix2=pix+2] = (data[pix]+data[pix1]+data[pix2])/3
+			} else {
+				while (p--)
+					data[pix-=4] = data[pix1=pix+1] = data[pix2=pix+2] = (data[pix]*0.3 + data[pix1]*0.59 + data[pix2]*0.11);
+			}
 			return true;
 		} else if (Pixastic.Client.isIE()) {
 			params.image.style.filter += " gray";
