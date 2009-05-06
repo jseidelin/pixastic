@@ -17,7 +17,7 @@ Pixastic.Actions.rotate = {
 			copy.height = height;
 			copy.getContext("2d").drawImage(canvas,0,0,width,height);
 
-			var angle = parseFloat(params.options.angle) * Math.PI / 180;
+			var angle = -parseFloat(params.options.angle) * Math.PI / 180;
 
 			var diag = Math.sqrt(width*width + height*height);
 
