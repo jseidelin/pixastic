@@ -1,7 +1,7 @@
 /*
- * Pixastic Lib - Color adjust filter - v0.1.0
+ * Pixastic Lib - Color adjust filter - v0.1.1
  * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
- * MIT License [http://www.opensource.org/licenses/mit-license.php]
+ * License: [http://www.pixastic.com/lib/license.txt]
  */
 
 Pixastic.Actions.coloradjust = {
@@ -18,33 +18,41 @@ Pixastic.Actions.coloradjust = {
 		if (Pixastic.Client.hasCanvasImageData()) {
 			var data = Pixastic.prepareData(params);
 			var rect = params.options.rect;
-			var w = rect.width;
-			var h = rect.height;
-			var w4 = w*4;
-			var y = h;
-			do {
-				var offsetY = (y-1)*w4;
-				var x = w;
-				do {
-					var offset = offsetY + (x-1)*4;
 
-					var r = data[offset] + red;
-					var g = data[offset+1] + green;
-					var b = data[offset+2] + blue;
+			var p = rect.width*rect.height;
+			var pix = p*4, pix1, pix2;
 
-					if (r < 0 ) r = 0;
-					if (g < 0 ) g = 0;
-					if (b < 0 ) b = 0;
-					if (r > 255 ) r = 255;
-					if (g > 255 ) g = 255;
-					if (b > 255 ) b = 255;
+			var r, g, b;
+			while (p--) {
+				pix -= 4;
 
-					data[offset] = r;
-					data[offset+1] = g;
-					data[offset+2] = b;
+				if (red) {
+					if ((r = data[pix] + red) < 0 ) 
+						data[pix] = 0;
+					else if (r > 255 ) 
+						data[pix] = 255;
+					else
+						data[pix] = r;
+				}
 
-				} while (--x);
-			} while (--y);
+				if (green) {
+					if ((g = data[pix1=pix+1] + green) < 0 ) 
+						data[pix1] = 0;
+					else if (g > 255 ) 
+						data[pix1] = 255;
+					else
+						data[pix1] = g;
+				}
+
+				if (blue) {
+					if ((b = data[pix2=pix+2] + blue) < 0 ) 
+						data[pix2] = 0;
+					else if (b > 255 ) 
+						data[pix2] = 255;
+					else
+						data[pix2] = b;
+				}
+			}
 			return true;
 		}
 	},

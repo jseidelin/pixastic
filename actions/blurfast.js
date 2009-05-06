@@ -1,13 +1,14 @@
 /*
- * Pixastic Lib - Blur Fast - v0.1.0
+ * Pixastic Lib - Blur Fast - v0.1.1
  * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
- * MIT License [http://www.opensource.org/licenses/mit-license.php]
+ * License: [http://www.pixastic.com/lib/license.txt]
  */
 
 Pixastic.Actions.blurfast = {
 	process : function(params) {
 
 		var amount = parseFloat(params.options.amount)||0;
+		var clear = !!(params.options.clear);
 
 		amount = Math.max(0,Math.min(5,amount));
 
@@ -17,12 +18,7 @@ Pixastic.Actions.blurfast = {
 			var ctx = params.canvas.getContext("2d");
 			ctx.save();
 			ctx.beginPath();
-			ctx.moveTo(rect.left,rect.top);
-			ctx.lineTo(rect.left+rect.width,rect.top);
-			ctx.lineTo(rect.left+rect.width,rect.top+rect.height);
-			ctx.lineTo(rect.left,rect.top+rect.height);
-			ctx.lineTo(rect.left,rect.top);
-			ctx.closePath();
+			ctx.rect(rect.left, rect.top, rect.width, rect.height);
 			ctx.clip();
 
 			var scale = 2;
@@ -33,7 +29,7 @@ Pixastic.Actions.blurfast = {
 			copy.width = smallWidth;
 			copy.height = smallHeight;
 
-			var clear = true;
+			var clear = false;
 			var steps = Math.round(amount * 20);
 
 			var copyCtx = copy.getContext("2d");
