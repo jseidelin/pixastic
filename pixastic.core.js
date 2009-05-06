@@ -1,11 +1,10 @@
 /*
- * Pixastic Lib - Core Functions - v0.1.0
+ * Pixastic Lib - Core Functions - v0.1.3
  * Copyright (c) 2008 Jacob Seidelin, cupboy@gmail.com, http://blog.nihilogic.dk/
  * MIT License [http://www.opensource.org/licenses/mit-license.php]
  */
 
 var Pixastic = (function() {
-
 
 
 	function addEvent(el, event, handler) {
@@ -36,7 +35,6 @@ var Pixastic = (function() {
 		addEvent(window, "load", execHandler);
 	}
 
-
 	function init() {
 		if (!Pixastic.parseOnLoad) return;
 		var imgEls = getElementsByClass("pixastic", null, "img");
@@ -57,7 +55,7 @@ var Pixastic = (function() {
 				}
 			}
 			if (actions.length) {
-				if (el.tagName == "IMG") {
+				if (el.tagName.toLowerCase() == "img") {
 					var dataImg = new Image();
 					dataImg.src = el.src;
 					if (dataImg.complete) {
@@ -92,8 +90,8 @@ var Pixastic = (function() {
 		}
 	}
 
-	onready(init);
-
+	if (typeof pixastic_no_onready == "undefined") // yuck.
+		onready(init);
 
 	// getElementsByClass by Dustin Diaz, http://www.dustindiaz.com/getelementsbyclass/
 	function getElementsByClass(searchClass,node,tag) {
@@ -119,7 +117,6 @@ var Pixastic = (function() {
 
 	function writeDebug(text, level) {
 		if (!Pixastic.debug) return;
-
 		try {
 			switch (level) {
 				case "warn" : 
@@ -149,7 +146,7 @@ var Pixastic = (function() {
 
 			options = options || {};
 
-			var imageIsCanvas = (img.tagName == "CANVAS");
+			var imageIsCanvas = (img.tagName.toLowerCase() == "canvas");
 			if (imageIsCanvas && Pixastic.Client.isIE()) {
 				if (Pixastic.debug) writeDebug("Tried to process a canvas element but browser is IE.");
 				return false;
@@ -163,6 +160,11 @@ var Pixastic = (function() {
 
 			var w = parseInt(img.offsetWidth);
 			var h = parseInt(img.offsetHeight);
+
+			if (imageIsCanvas) {
+				w = img.width;
+				h = img.height;
+			}
 
 			if (actionName.indexOf("(") > -1) {
 				var tmp = actionName;
@@ -213,6 +215,19 @@ var Pixastic = (function() {
 				canvas.style.width = w+"px";
 				canvas.style.height = h+"px";
 				ctx.drawImage(dataImg,0,0,w,h);
+
+				if (!img.__pixastic_org_image) {
+					canvas.__pixastic_org_image = img;
+					canvas.__pixastic_org_width = w;
+					canvas.__pixastic_org_height = h;
+				} else {
+					canvas.__pixastic_org_image = img.__pixastic_org_image;
+					canvas.__pixastic_org_width = img.__pixastic_org_width;
+					canvas.__pixastic_org_height = img.__pixastic_org_height;
+				}
+
+			} else if (Pixastic.Client.isIE() && typeof img.__pixastic_org_style == "undefined") {
+				img.__pixastic_org_style = img.style.cssText;
 			}
 
 			var params = {
@@ -223,12 +238,10 @@ var Pixastic = (function() {
 				useData : true,
 				options : options
 			}
-	
-			//var time = new Date().getTime();
-	
-			var res = Pixastic.Actions[actionName].process(params);
 
-			//console.log("Time:",new Date().getTime() - time,"ms");
+			// Ok, let's do it!
+
+			var res = Pixastic.Actions[actionName].process(params);
 
 			if (!res) {
 				return false;
@@ -238,25 +251,29 @@ var Pixastic = (function() {
 				if (params.useData) {
 					if (Pixastic.Client.hasCanvasImageData()) {
 						canvas.getContext("2d").putImageData(params.canvasData, options.rect.left, options.rect.top);
+
 						// Opera doesn't seem to update the canvas until we draw something on it, lets draw a 0x0 rectangle.
 						canvas.getContext("2d").fillRect(0,0,0,0);
 					}
 				}
-				// copy properties and stuff from the source image
-				canvas.title = img.title;
-				canvas.imgsrc = img.imgsrc;
-				if (!imageIsCanvas) canvas.alt  = img.alt;
-				if (!imageIsCanvas) canvas.imgsrc = img.src;
-				canvas.className = img.className;
-				canvas.setAttribute("style", img.getAttribute("style"));
-				canvas.cssText = img.cssText;
-				canvas.name = img.name;
-				canvas.tabIndex = img.tabIndex;
-				canvas.id = img.id;
 
-				if (img.parentNode && img.parentNode.replaceChild) {
-					img.parentNode.replaceChild(canvas, img);
+				if (!options.leaveDOM) {
+					// copy properties and stuff from the source image
+					canvas.title = img.title;
+					canvas.imgsrc = img.imgsrc;
+					if (!imageIsCanvas) canvas.alt  = img.alt;
+					if (!imageIsCanvas) canvas.imgsrc = img.src;
+					canvas.className = img.className;
+					canvas.style.cssText = img.style.cssText;
+					canvas.name = img.name;
+					canvas.tabIndex = img.tabIndex;
+					canvas.id = img.id;
+					if (img.parentNode && img.parentNode.replaceChild) {
+						img.parentNode.replaceChild(canvas, img);
+					}
 				}
+
+				options.resultCanvas = canvas;
 
 				return canvas;
 			}
@@ -276,7 +293,7 @@ var Pixastic = (function() {
 		// load the image file
 		process : function(img, actionName, options, callback)
 		{
-			if (img.tagName == "IMG") {
+			if (img.tagName.toLowerCase() == "img") {
 				var dataImg = new Image();
 				dataImg.src = img.src;
 				if (dataImg.complete) {
@@ -290,10 +307,28 @@ var Pixastic = (function() {
 					}
 				}
 			}
-			if (img.tagName == "CANVAS") {
+			if (img.tagName.toLowerCase() == "canvas") {
 				var res = Pixastic.applyAction(img, img, actionName, options);
 				if (callback) callback(res);
 				return res;
+			}
+		},
+
+		revert : function(img) {
+			if (Pixastic.Client.hasCanvas()) {
+				if (img.tagName.toLowerCase() == "canvas" && img.__pixastic_org_image) {
+					img.width = img.__pixastic_org_width;
+					img.height = img.__pixastic_org_height;
+					img.getContext("2d").drawImage(img.__pixastic_org_image, 0, 0);
+
+					if (img.parentNode && img.parentNode.replaceChild) {
+						img.parentNode.replaceChild(img.__pixastic_org_image, img);
+					}
+
+					return img;
+				}
+			} else if (Pixastic.Client.isIE() && typeof img.__pixastic_org_style != "undefined") {
+				img.style.cssText = img.__pixastic_org_style;
 			}
 		},
 
