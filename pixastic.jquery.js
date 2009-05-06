@@ -1,10 +1,15 @@
+/*
+ * Pixastic Lib - jQuery plugin
+ * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
+ * License: [http://www.pixastic.com/lib/license.txt]
+ */
 
 if (typeof jQuery != "undefined" && jQuery && jQuery.fn) {
 	jQuery.fn.pixastic = function(action, options) {
 		var newElements = [];
 		this.each(
 			function () {
-				if (this.tagName == "IMG" && !this.complete) {
+				if (this.tagName.toLowerCase() == "img" && !this.complete) {
 					return;
 				}
 				var res = Pixastic.process(this, action, options);
