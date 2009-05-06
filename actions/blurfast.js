@@ -8,7 +8,7 @@ Pixastic.Actions.blurfast = {
 	process : function(params) {
 
 		var amount = parseFloat(params.options.amount)||0;
-		var clear = !!(params.options.clear);
+		var clear = !!(params.options.clear && params.options.clear != "false");
 
 		amount = Math.max(0,Math.min(5,amount));
 

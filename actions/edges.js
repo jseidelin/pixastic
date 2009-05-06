@@ -7,20 +7,14 @@
 Pixastic.Actions.edges = {
 	process : function(params) {
 
-		var mono = !!(params.options.mono);
-
-		var strength = 1.0;
-
-		//if (typeof params.options.strength != "undefined")
-		//	strength = parseFloat(params.options.strength)||0;
-
-		var invert = !!(params.options.invert);
+		var mono = !!(params.options.mono && params.options.mono != "false");
+		var invert = !!(params.options.invert && params.options.invert != "false");
 
 		if (Pixastic.Client.hasCanvasImageData()) {
 			var data = Pixastic.prepareData(params);
 			var dataCopy = Pixastic.prepareData(params, true)
 
-			var c = -strength/8;
+			var c = -1/8;
 			var kernel = [
 				[c, 	c, 	c],
 				[c, 	1, 	c],

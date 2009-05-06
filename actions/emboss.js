@@ -10,7 +10,7 @@ Pixastic.Actions.emboss = {
 		var strength = parseFloat(params.options.strength)||1;
 		var greyLevel = typeof params.options.greyLevel != "undefined" ? parseInt(params.options.greyLevel) : 180;
 		var direction = params.options.direction||"topleft";
-		var blend = !!params.options.blend;
+		var blend = !!(params.options.blend && params.options.blend != "false");
 
 		var dirY = 0;
 		var dirX = 0;

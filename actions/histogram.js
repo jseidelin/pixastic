@@ -7,8 +7,8 @@
 Pixastic.Actions.histogram = {
 	process : function(params) {
 
-		var average = !!(params.options.average);
-		var paint = !!(params.options.paint);
+		var average = !!(params.options.average && params.options.average != "false");
+		var paint = !!(params.options.paint && params.options.paint != "false");
 		var color = params.options.color || "rgba(255,255,255,0.5)";
 		var values = [];
 		if (typeof params.options.returnValue != "object") {

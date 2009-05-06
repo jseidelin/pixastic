@@ -16,7 +16,7 @@ Pixastic.Actions.noise = {
 		if (typeof params.options.strength != "undefined")
 			strength = parseFloat(params.options.strength)||0;
 		if (typeof params.options.mono != "undefined")
-			mono = !!(params.options.mono);
+			mono = !!(params.options.mono && params.options.mono != "false");
 
 		amount = Math.max(0,Math.min(1,amount));
 		strength = Math.max(0,Math.min(1,strength));

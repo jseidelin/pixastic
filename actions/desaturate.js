@@ -7,7 +7,7 @@
 Pixastic.Actions.desaturate = {
 
 	process : function(params) {
-		var useAverage = !!params.options.average;
+		var useAverage = !!(params.options.average && params.options.average != "false");
 
 		if (Pixastic.Client.hasCanvasImageData()) {
 			var data = Pixastic.prepareData(params);

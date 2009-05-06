@@ -10,7 +10,7 @@ Pixastic.Actions.pointillize = {
 		var radius = Math.max(1,parseInt(params.options.radius,10));
 		var density = Math.min(5,Math.max(0,parseFloat(params.options.density)||0));
 		var noise = Math.max(0,parseFloat(params.options.noise)||0);
-		var transparent = !!params.options.transparent;
+		var transparent = !!(params.options.transparent && params.options.transparent != "false");
 
 		if (Pixastic.Client.hasCanvasImageData()) {
 			var rect = params.options.rect;
