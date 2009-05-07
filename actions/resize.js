@@ -7,15 +7,18 @@
 Pixastic.Actions.resize = {
 	process : function(params) {
 		if (Pixastic.Client.hasCanvas()) {
-			var width = params.options.width;
-			var height = params.options.height;
+			var width = parseInt(params.options.width,10);
+			var height = parseInt(params.options.height,10);
 			var canvas = params.canvas;
+
+			if (width < 1) width = 1;
+			if (width < 2) width = 2;
 
 			var copy = document.createElement("canvas");
 			copy.width = width;
 			copy.height = height;
-			copy.getContext("2d").drawImage(canvas,0,0,width,height);
 
+			copy.getContext("2d").drawImage(canvas,0,0,width,height);
 			canvas.width = width;
 			canvas.height = height;
 
