@@ -20,6 +20,8 @@ Pixastic.Actions.pointillize = {
 			var y = h;
 
 			var ctx = params.canvas.getContext("2d");
+			var canvasWidth = params.canvas.width;
+			var canvasHeight = params.canvas.height;
 
 			var pixel = document.createElement("canvas");
 			pixel.width = pixel.height = 1;
@@ -50,11 +52,27 @@ Pixastic.Actions.pointillize = {
 					if (pixX < 0) pixX = 0;
 					if (pixY < 0) pixY = 0;
 
-					pixelCtx.drawImage(copy, pixX, pixY, diameter, diameter, 0, 0, 1, 1);
+					var cx = rndX + rect.left;
+					var cy = rndY + rect.top;
+					if (cx < 0) cx = 0;
+					if (cx > canvasWidth) cx = canvasWidth;
+					if (cy < 0) cy = 0;
+					if (cy > canvasHeight) cy = canvasHeight;
+
+					var diameterX = diameter;
+					var diameterY = diameter;
+
+					if (diameterX + pixX > w)
+						diameterX = w - pixX;
+					if (diameterY + pixY > h)
+						diameterY = h - pixY;
+
+					pixelCtx.drawImage(copy, pixX, pixY, diameterX, diameterY, 0, 0, 1, 1);
 					var data = pixelCtx.getImageData(0,0,1,1).data;
+
 					ctx.fillStyle = "rgb(" + data[0] + "," + data[1] + "," + data[2] + ")";
 					ctx.beginPath();
-					ctx.arc(rect.left + rndX,rect.top + rndY, radius, 0, Math.PI*2, true);
+					ctx.arc(cx, cy, radius, 0, Math.PI*2, true);
 					ctx.closePath();
 					ctx.fill();
 				}
