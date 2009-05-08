@@ -66,6 +66,8 @@ Pixastic.Actions.pointillize = {
 						diameterX = w - pixX;
 					if (diameterY + pixY > h)
 						diameterY = h - pixY;
+					if (diameterX < 1) diameterX = 1;
+					if (diameterY < 1) diameterY = 1;
 
 					pixelCtx.drawImage(copy, pixX, pixY, diameterX, diameterY, 0, 0, 1, 1);
 					var data = pixelCtx.getImageData(0,0,1,1).data;
