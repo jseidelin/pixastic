@@ -19,14 +19,19 @@ Pixastic.Actions.rotate = {
 
 			var angle = -parseFloat(params.options.angle) * Math.PI / 180;
 
+			var dimAngle = angle;
+			if (dimAngle > Math.PI*0.5)
+				dimAngle = Math.PI - dimAngle;
+			if (dimAngle < -Math.PI*0.5)
+				dimAngle = -Math.PI - dimAngle;
+
 			var diag = Math.sqrt(width*width + height*height);
 
-			var diagAngle = Math.atan2(height, width);
+			var diagAngle1 = Math.abs(dimAngle) - Math.abs(Math.atan2(height, width));
+			var diagAngle2 = Math.abs(dimAngle) + Math.abs(Math.atan2(height, width));
 
-			if (angle < 0) diagAngle = -diagAngle;
-
-			var newHeight = Math.abs(Math.sin(diagAngle + angle) * diag);
-			var newWidth = Math.abs(Math.cos(-diagAngle + angle) * diag);
+			var newWidth = Math.abs(Math.cos(diagAngle1) * diag);
+			var newHeight = Math.abs(Math.sin(diagAngle2) * diag);
 
 			canvas.width = newWidth;
 			canvas.height = newHeight;
