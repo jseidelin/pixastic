@@ -36,7 +36,6 @@ var Pixastic = (function() {
 	}
 
 	function init() {
-		if (!Pixastic.parseOnLoad) return;
 		var imgEls = getElementsByClass("pixastic", null, "img");
 		var canvasEls = getElementsByClass("pixastic", null, "canvas");
 		var elements = imgEls.concat(canvasEls);
@@ -90,7 +89,7 @@ var Pixastic = (function() {
 		}
 	}
 
-	if (typeof pixastic_no_onready == "undefined") // yuck.
+	if (typeof pixastic_parseonload != "undefined" && pixastic_parseonload)
 		onready(init);
 
 	// getElementsByClass by Dustin Diaz, http://www.dustindiaz.com/getelementsbyclass/
