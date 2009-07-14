@@ -194,7 +194,13 @@ var Pixastic = (function() {
 				options.rect = {
 					left : 0, top : 0, width : w, height : h
 				};
+			} else {
+				options.rect.left = Math.round(options.rect.left);
+				options.rect.top = Math.round(options.rect.top);
+				options.rect.width = Math.round(options.rect.width);
+				options.rect.height = Math.round(options.rect.height);
 			}
+
 			var validAction = false;
 			if (Pixastic.Actions[actionName] && typeof Pixastic.Actions[actionName].process == "function") {
 				validAction = true;
