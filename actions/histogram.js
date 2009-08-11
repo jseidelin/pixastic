@@ -1,5 +1,5 @@
 /*
- * Pixastic Lib - Histogram - v0.1.0
+ * Pixastic Lib - Histogram - v0.1.1
  * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
  * License: [http://www.pixastic.com/lib/license.txt]
  */
@@ -29,22 +29,20 @@ Pixastic.Actions.histogram = {
 			}
 
 			var rect = params.options.rect;
-			var w = rect.width;
-			var h = rect.height;
-			var w4 = w*4;
-			var y = h;
-			do {
-				var offsetY = (y-1)*w4;
-				var x = w;
-				do {
-					var offset = offsetY + (x*4-4);
-					var brightness = average ? 
-						Math.round((data[offset]+data[offset+1]+data[offset+2])/3)
-						: Math.round(data[offset]*0.3 + data[offset+1]*0.59 + data[offset+2]*0.11);
-					values[brightness]++;
+			var p = rect.width * rect.height;
 
-				} while (--x);
-			} while (--y);
+			var pix = p*4, pix1 = pix + 1, pix2 = pix + 2, pix3 = pix + 3;
+			var round = Math.round;
+
+			if (average) {
+				while (p--) {
+					values[ round((data[pix-=4]+data[pix+1]+data[pix+2])/3) ]++;
+				}
+			} else {
+				while (p--) {
+					values[ round(data[pix-=4]*0.3 + data[pix+1]*0.59 + data[pix+2]*0.11) ]++;
+				}
+			}
 
 			if (paint) {
 				var maxValue = 0;

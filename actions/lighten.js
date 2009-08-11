@@ -1,5 +1,5 @@
 /*
- * Pixastic Lib - Lighten filter - v0.1.0
+ * Pixastic Lib - Lighten filter - v0.1.1
  * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
  * License: [http://www.pixastic.com/lib/license.txt]
  */
@@ -8,41 +8,29 @@ Pixastic.Actions.lighten = {
 
 	process : function(params) {
 		var amount = parseFloat(params.options.amount) || 0;
+		amount = Math.max(-1, Math.min(1, amount));
 
 		if (Pixastic.Client.hasCanvasImageData()) {
 			var data = Pixastic.prepareData(params);
 			var rect = params.options.rect;
-			var w = rect.width;
-			var h = rect.height;
-			var w4 = w*4;
-			var y = h;
-			do {
-				var offsetY = (y-1)*w4;
-				var x = w;
-				do {
-					var offset = offsetY + (x-1)*4;
 
-					var r = data[offset];
-					var g = data[offset+1];
-					var b = data[offset+2];
+			var p = rect.width * rect.height;
 
-					r += r*amount;
-					g += g*amount;
-					b += b*amount;
+			var pix = p*4, pix1 = pix + 1, pix2 = pix + 2;
+			var mul = amount + 1;
 
-					if (r < 0 ) r = 0;
-					if (g < 0 ) g = 0;
-					if (b < 0 ) b = 0;
-					if (r > 255 ) r = 255;
-					if (g > 255 ) g = 255;
-					if (b > 255 ) b = 255;
+			while (p--) {
+				if ((data[pix-=4] = data[pix] * mul) > 255)
+					data[pix] = 255;
 
-					data[offset] = r;
-					data[offset+1] = g;
-					data[offset+2] = b;
+				if ((data[pix1-=4] = data[pix1] * mul) > 255)
+					data[pix1] = 255;
 
-				} while (--x);
-			} while (--y);
+				if ((data[pix2-=4] = data[pix2] * mul) > 255)
+					data[pix2] = 255;
+
+			}
+
 			return true;
 
 		} else if (Pixastic.Client.isIE()) {

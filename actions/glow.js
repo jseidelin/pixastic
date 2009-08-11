@@ -58,33 +58,15 @@ Pixastic.Actions.glow = {
 
 			var data = Pixastic.prepareData(params);
 			var blurData = Pixastic.prepareData({canvas:blurCanvas,options:params.options});
-			var w = rect.width;
-			var h = rect.height;
-			var w4 = w*4;
-			var y = h;
-			do {
-				var offsetY = (y-1)*w4;
-				var x = w;
-				do {
-					var offset = offsetY + (x*4-4);
 
-					var r = data[offset] + amount * blurData[offset];
-					var g = data[offset+1] + amount * blurData[offset+1];
-					var b = data[offset+2] + amount * blurData[offset+2];
-	
-					if (r > 255) r = 255;
-					if (g > 255) g = 255;
-					if (b > 255) b = 255;
-					if (r < 0) r = 0;
-					if (g < 0) g = 0;
-					if (b < 0) b = 0;
+			var p = rect.width * rect.height;
 
-					data[offset] = r;
-					data[offset+1] = g;
-					data[offset+2] = b;
-
-				} while (--x);
-			} while (--y);
+			var pix = p*4, pix1 = pix + 1, pix2 = pix + 2, pix3 = pix + 3;
+			while (p--) {
+				if ((data[pix-=4] += amount * blurData[pix]) > 255) data[pix] = 255;
+				if ((data[pix1-=4] += amount * blurData[pix1]) > 255) data[pix1] = 255;
+				if ((data[pix2-=4] += amount * blurData[pix2]) > 255) data[pix2] = 255;
+			}
 
 			return true;
 		}
