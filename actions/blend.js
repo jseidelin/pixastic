@@ -109,12 +109,13 @@ Pixastic.Actions.blend = {
 					break;
 
 				case "lineardodge" : 
+					/*
 					otherCtx.globalCompositeOperation = "source-over";
 					otherCtx.drawImage(params.canvas, 0, 0);
 					otherCtx.globalCompositeOperation = "lighter";
 					otherCtx.drawImage(image, 0, 0);
+					*/
 
-					/*
 					while (p--) {
 						if ((r3 = data[pix-=4] + data2[pix]) > 255)
 							data2[pix] = 255;
@@ -130,7 +131,6 @@ Pixastic.Actions.blend = {
 							data2[pix2] = b3;
 					}
 					dataChanged = true;
-					*/
 
 					break;
 
