@@ -16,6 +16,7 @@ Pixastic.Actions.blend = {
 		if (!image) return false;
 
 		if (Pixastic.Client.hasCanvasImageData()) {
+
 			var rect = params.options.rect;
 			var data = Pixastic.prepareData(params);
 			var w = rect.width;
@@ -470,16 +471,33 @@ Pixastic.Actions.blend = {
 			if (dataChanged) 
 				otherCtx.putImageData(dataDesc2,0,0);
 
-			var ctx = params.canvas.getContext("2d");
-			ctx.save();
-			ctx.globalAlpha = amount;
-			ctx.drawImage(
-				otherCanvas,
-				0,0,rect.width,rect.height,
-				rect.left,rect.top,rect.width,rect.height
-			);
-			ctx.globalAlpha = 1;
-			ctx.restore();
+			if (amount != 1 && !Pixastic.Client.hasGlobalAlpha()) {
+				var p = w*h;
+				var amount2 = amount;
+				var amount1 = 1 - amount;
+				while (p--) {
+					var pix = p*4;
+					var r = (data[pix] * amount1 + data2[pix] * amount2)>>0;
+					var g = (data[pix+1] * amount1 + data2[pix+1] * amount2)>>0;
+					var b = (data[pix+2] * amount1 + data2[pix+2] * amount2)>>0;
+
+					data[pix] = r;
+					data[pix+1] = g;
+					data[pix+2] = b;
+				}
+				params.useData = true;
+			} else {
+				var ctx = params.canvas.getContext("2d");
+				ctx.save();
+				ctx.globalAlpha = amount;
+				ctx.drawImage(
+					otherCanvas,
+					0,0,rect.width,rect.height,
+					rect.left,rect.top,rect.width,rect.height
+				);
+				ctx.globalAlpha = 1;
+				ctx.restore();
+			}
 
 			return true;
 		}

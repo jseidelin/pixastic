@@ -363,6 +363,30 @@ var Pixastic = (function() {
 				}
 			})(),
 
+			hasGlobalAlpha : (function() {
+				var red = document.createElement("canvas");
+				red.width = red.height = 1;
+				var redctx = red.getContext("2d");
+				redctx.fillStyle = "rgb(255,0,0)";
+				redctx.fillRect(0,0,1,1);
+
+				var blue = document.createElement("canvas");
+				blue.width = blue.height = 1;
+				var bluectx = red.getContext("2d");
+				bluectx.fillStyle = "rgb(0,0,255)";
+				bluectx.fillRect(0,0,1,1);
+
+				redctx.globalAlpha = 0.5;
+				redctx.drawImage(blue, 0, 0);
+				var reddata = redctx.getImageData(0,0,1,1).data;
+
+				var hasAlpha = (reddata[2] != 255);
+
+				return function() {
+					return hasAlpha;
+				}
+			})(),
+
 			isIE : function() {
 				return !!document.all && !!window.attachEvent && !window.opera;
 			}
