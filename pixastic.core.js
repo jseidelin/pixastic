@@ -301,8 +301,7 @@ var Pixastic = (function() {
 		},
 
 		// load the image file
-		process : function(img, actionName, options, callback)
-		{
+		process : function(img, actionName, options, callback) {
 			if (img.tagName.toLowerCase() == "img") {
 				var dataImg = new Image();
 				dataImg.src = img.src;
