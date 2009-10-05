@@ -152,7 +152,9 @@ var Pixastic = (function() {
 			}
 
 			var canvas, ctx;
+			var hasOutputCanvas = false;
 			if (Pixastic.Client.hasCanvas()) {
+				hasOutCanvas = !!options.outputCanvas;
 				canvas = options.outputCanvas || document.createElement("canvas");
 				ctx = canvas.getContext("2d");
 			}
@@ -217,8 +219,10 @@ var Pixastic = (function() {
 			if (Pixastic.Client.hasCanvas()) {
 				canvas.width = w;
 				canvas.height = h;
-				canvas.style.width = w+"px";
-				canvas.style.height = h+"px";
+				if (!hasOutputCanvas) {
+					canvas.style.width = w+"px";
+					canvas.style.height = h+"px";
+				}
 				ctx.drawImage(dataImg,0,0,w,h);
 
 				if (!img.__pixastic_org_image) {
@@ -258,6 +262,7 @@ var Pixastic = (function() {
 						canvas.getContext("2d").putImageData(params.canvasData, options.rect.left, options.rect.top);
 
 						// Opera doesn't seem to update the canvas until we draw something on it, lets draw a 0x0 rectangle.
+						// Is this still so?
 						canvas.getContext("2d").fillRect(0,0,0,0);
 					}
 				}
