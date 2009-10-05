@@ -154,8 +154,9 @@ var Pixastic = (function() {
 			var canvas, ctx;
 			var hasOutputCanvas = false;
 			if (Pixastic.Client.hasCanvas()) {
-				hasOutCanvas = !!options.outputCanvas;
-				canvas = options.outputCanvas || document.createElement("canvas");
+				//hasOutputCanvas = !!options.resultCanvas;
+				//canvas = options.resultCanvas || document.createElement("canvas");
+				canvas = document.createElement("canvas");
 				ctx = canvas.getContext("2d");
 			}
 
