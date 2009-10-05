@@ -153,7 +153,7 @@ var Pixastic = (function() {
 
 			var canvas, ctx;
 			if (Pixastic.Client.hasCanvas()) {
-				canvas = document.createElement("canvas");
+				canvas = options.outputCanvas || document.createElement("canvas");
 				ctx = canvas.getContext("2d");
 			}
 
