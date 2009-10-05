@@ -154,18 +154,37 @@ var Pixastic = (function() {
 			var canvas, ctx;
 			var hasOutputCanvas = false;
 			if (Pixastic.Client.hasCanvas()) {
-				//hasOutputCanvas = !!options.resultCanvas;
-				//canvas = options.resultCanvas || document.createElement("canvas");
-				canvas = document.createElement("canvas");
+				hasOutputCanvas = !!options.resultCanvas;
+				canvas = options.resultCanvas || document.createElement("canvas");
 				ctx = canvas.getContext("2d");
 			}
 
-			var w = parseInt(img.offsetWidth);
-			var h = parseInt(img.offsetHeight);
+			var w = img.offsetWidth;
+			var h = img.offsetHeight;
 
 			if (imageIsCanvas) {
 				w = img.width;
 				h = img.height;
+			}
+
+			// offsetWidth/Height might be 0 if the image is not in the document
+			if (w == 0 || h == 0) {
+				if (img.parentNode == null) {
+					// add the image to the doc (way out left), read its dimensions and remove it again
+					var oldpos = img.style.position;
+					var oldleft = img.style.left;
+					img.style.position = "absolute";
+					img.style.left = "-9999px";
+					document.body.appendChild(img);
+					w = img.offsetWidth;
+					h = img.offsetHeight;
+					document.body.removeChild(img);
+					img.style.position = oldpos;
+					img.style.left = oldleft;
+				} else {
+					if (Pixastic.debug) writeDebug("Image has 0 width and/or height.");
+					return;
+				}
 			}
 
 			if (actionName.indexOf("(") > -1) {
@@ -218,8 +237,10 @@ var Pixastic = (function() {
 			}
 
 			if (Pixastic.Client.hasCanvas()) {
-				canvas.width = w;
-				canvas.height = h;
+				if (canvas !== img) {
+					canvas.width = w;
+					canvas.height = h;
+				}
 				if (!hasOutputCanvas) {
 					canvas.style.width = w+"px";
 					canvas.style.height = h+"px";
