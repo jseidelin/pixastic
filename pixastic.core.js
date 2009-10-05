@@ -22,8 +22,8 @@ var Pixastic = (function() {
 				handler();
 			}
 		}
-		document.write("<"+"script defer src=\"//:\" id=\"__onload_ie_sumbox__\"></"+"script>");
-		var script = document.getElementById("__onload_ie_sumbox__");
+		document.write("<"+"script defer src=\"//:\" id=\"__onload_ie_pixastic__\"></"+"script>");
+		var script = document.getElementById("__onload_ie_pixastic__");
 		script.onreadystatechange = function() {
 			if (script.readyState == "complete") {
 				script.parentNode.removeChild(script);
