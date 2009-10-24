@@ -401,7 +401,7 @@ var Pixastic = (function() {
 
 					var blue = document.createElement("canvas");
 					blue.width = blue.height = 1;
-					var bluectx = red.getContext("2d");
+					var bluectx = blue.getContext("2d");
 					bluectx.fillStyle = "rgb(0,0,255)";
 					bluectx.fillRect(0,0,1,1);
 
