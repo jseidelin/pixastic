@@ -134,6 +134,61 @@ var Pixastic = (function() {
 		}
 	}
 
+	// canvas capability checks
+
+	var hasCanvas = (function() {
+		var c = document.createElement("canvas");
+		var val = false;
+		try {
+			val = !!((typeof c.getContext == "function") && c.getContext("2d"));
+		} catch(e) {}
+		return function() {
+			return val;
+		}
+	})();
+
+	var hasCanvasImageData = (function() {
+		var c = document.createElement("canvas");
+		var val = false;
+		var ctx;
+		try {
+			if (typeof c.getContext == "function" && (ctx = c.getContext("2d"))) {
+				val = (typeof ctx.getImageData == "function");
+			}
+		} catch(e) {}
+		return function() {
+			return val;
+		}
+	})();
+
+	var hasGlobalAlpha = (function() {
+		var hasAlpha = false;
+		var red = document.createElement("canvas");
+		if (hasCanvas() && hasCanvasImageData()) {
+			red.width = red.height = 1;
+			var redctx = red.getContext("2d");
+			redctx.fillStyle = "rgb(255,0,0)";
+			redctx.fillRect(0,0,1,1);
+	
+			var blue = document.createElement("canvas");
+			blue.width = blue.height = 1;
+			var bluectx = blue.getContext("2d");
+			bluectx.fillStyle = "rgb(0,0,255)";
+			bluectx.fillRect(0,0,1,1);
+	
+			redctx.globalAlpha = 0.5;
+			redctx.drawImage(blue, 0, 0);
+			var reddata = redctx.getImageData(0,0,1,1).data;
+	
+			hasAlpha = (reddata[2] != 255);
+		}
+		return function() {
+			return hasAlpha;
+		}
+	})();
+
+
+	// return public interface
 
 	return {
 
@@ -365,57 +420,9 @@ var Pixastic = (function() {
 		},
 
 		Client : {
-			hasCanvas : (function() {
-				var c = document.createElement("canvas");
-				var val = false;
-				try {
-					val = !!((typeof c.getContext == "function") && c.getContext("2d"));
-				} catch(e) {}
-				return function() {
-					return val;
-				}
-			})(),
-
-			hasCanvasImageData : (function() {
-				var c = document.createElement("canvas");
-				var val = false;
-				var ctx;
-				try {
-					if (typeof c.getContext == "function" && (ctx = c.getContext("2d"))) {
-						val = (typeof ctx.getImageData == "function");
-					}
-				} catch(e) {}
-				return function() {
-					return val;
-				}
-			})(),
-
-			hasGlobalAlpha : (function() {
-				var hasAlpha = false;
-				var red = document.createElement("canvas");
-				if (red.getContext) {
-					red.width = red.height = 1;
-					var redctx = red.getContext("2d");
-					redctx.fillStyle = "rgb(255,0,0)";
-					redctx.fillRect(0,0,1,1);
-
-					var blue = document.createElement("canvas");
-					blue.width = blue.height = 1;
-					var bluectx = blue.getContext("2d");
-					bluectx.fillStyle = "rgb(0,0,255)";
-					bluectx.fillRect(0,0,1,1);
-
-					redctx.globalAlpha = 0.5;
-					redctx.drawImage(blue, 0, 0);
-					var reddata = redctx.getImageData(0,0,1,1).data;
-
-					hasAlpha = (reddata[2] != 255);
-				}
-				return function() {
-					return hasAlpha;
-				}
-			})(),
-
+			hasCanvas : hasCanvas,
+			hasCanvasImageData : hasCanvasImageData,
+			hasGlobalAlpha : hasGlobalAlpha,
 			isIE : function() {
 				return !!document.all && !!window.attachEvent && !window.opera;
 			}
