@@ -17,7 +17,6 @@ if (typeof jQuery != "undefined" && jQuery && jQuery.fn) {
 				} else {
 					var res = Pixastic.process(this, action, options);
 				}
-				var res = Pixastic.process(this, action, options);
 				if (res) {
 					newElements.push(res);
 				}
