@@ -4,7 +4,18 @@
  * License: [http://www.pixastic.com/lib/license.txt]
  */
 
-var Pixastic = (function() {
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var Canvas   = require('canvas');
+    var Image    = Canvas.Image;
+    document = {
+        createElement: function() {
+            return new Canvas();
+        }
+    };
+}
+
+Pixastic = (function() {
 
 
 	function addEvent(el, event, handler) {
@@ -136,6 +147,13 @@ var Pixastic = (function() {
 
 	// canvas capability checks
 
+	var isNode = (function() {
+		return function () {
+            return typeof module !== 'undefined'
+                && module.exports;
+        };
+	})();
+
 	var hasCanvas = (function() {
 		var c = document.createElement("canvas");
 		var val = false;
@@ -199,12 +217,17 @@ var Pixastic = (function() {
 		applyAction : function(img, dataImg, actionName, options) {
 
 			options = options || {};
-
-			var imageIsCanvas = (img.tagName.toLowerCase() == "canvas");
-			if (imageIsCanvas && Pixastic.Client.isIE()) {
-				if (Pixastic.debug) writeDebug("Tried to process a canvas element but browser is IE.");
-				return false;
-			}
+            
+			if (Pixastic.Client.isNode()) {
+			    var imageIsCanvas = img instanceof Canvas
+                               ||   img instanceof Image;
+            } else {
+                var imageIsCanvas = (img.tagName.toLowerCase() == "canvas");
+                if (imageIsCanvas && Pixastic.Client.isIE()) {
+                    if (Pixastic.debug) writeDebug("Tried to process a canvas element but browser is IE.");
+                    return false;
+                }
+            }
 
 			var canvas, ctx;
 			var hasOutputCanvas = false;
@@ -296,10 +319,12 @@ var Pixastic = (function() {
 					canvas.width = w;
 					canvas.height = h;
 				}
-				if (!hasOutputCanvas) {
-					canvas.style.width = w+"px";
-					canvas.style.height = h+"px";
-				}
+			    if (!Pixastic.Client.isNode()) {
+                    if (!hasOutputCanvas) {
+                        canvas.style.width = w+"px";
+                        canvas.style.height = h+"px";
+                    }
+                }
 				ctx.drawImage(dataImg,0,0,w,h);
 
 				if (!img.__pixastic_org_image) {
@@ -344,21 +369,23 @@ var Pixastic = (function() {
 					}
 				}
 
-				if (!options.leaveDOM) {
-					// copy properties and stuff from the source image
-					canvas.title = img.title;
-					canvas.imgsrc = img.imgsrc;
-					if (!imageIsCanvas) canvas.alt  = img.alt;
-					if (!imageIsCanvas) canvas.imgsrc = img.src;
-					canvas.className = img.className;
-					canvas.style.cssText = img.style.cssText;
-					canvas.name = img.name;
-					canvas.tabIndex = img.tabIndex;
-					canvas.id = img.id;
-					if (img.parentNode && img.parentNode.replaceChild) {
-						img.parentNode.replaceChild(canvas, img);
-					}
-				}
+			    if (!Pixastic.Client.isNode()) {
+                    if (!options.leaveDOM) {
+                        // copy properties and stuff from the source image
+                        canvas.title = img.title;
+                        canvas.imgsrc = img.imgsrc;
+                        if (!imageIsCanvas) canvas.alt  = img.alt;
+                        if (!imageIsCanvas) canvas.imgsrc = img.src;
+                        canvas.className = img.className;
+                        canvas.style.cssText = img.style.cssText;
+                        canvas.name = img.name;
+                        canvas.tabIndex = img.tabIndex;
+                        canvas.id = img.id;
+                        if (img.parentNode && img.parentNode.replaceChild) {
+                            img.parentNode.replaceChild(canvas, img);
+                        }
+                    }
+                }
 
 				options.resultCanvas = canvas;
 
@@ -379,6 +406,11 @@ var Pixastic = (function() {
 
 		// load the image file
 		process : function(img, actionName, options, callback) {
+			if (Pixastic.Client.isNode()) {
+				var res = Pixastic.applyAction(img, img, actionName, options);
+				if (callback) callback(res);
+				return res;
+            }
 			if (img.tagName.toLowerCase() == "img") {
 				var dataImg = new Image();
 				dataImg.src = img.src;
@@ -402,7 +434,8 @@ var Pixastic = (function() {
 
 		revert : function(img) {
 			if (Pixastic.Client.hasCanvas()) {
-				if (img.tagName.toLowerCase() == "canvas" && img.__pixastic_org_image) {
+				if ((Pixastic.Client.isNode() && img.__pixastic_org_image)
+                || (img.tagName.toLowerCase() == "canvas" && img.__pixastic_org_image)) {
 					img.width = img.__pixastic_org_width;
 					img.height = img.__pixastic_org_height;
 					img.getContext("2d").drawImage(img.__pixastic_org_image, 0, 0);
@@ -420,6 +453,7 @@ var Pixastic = (function() {
 		},
 
 		Client : {
+			isNode : isNode,
 			hasCanvas : hasCanvas,
 			hasCanvasImageData : hasCanvasImageData,
 			hasGlobalAlpha : hasGlobalAlpha,
@@ -433,3 +467,39 @@ var Pixastic = (function() {
 
 
 })();
+
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Pixastic;
+    require('./actions/blend');
+    require('./actions/blur');
+    require('./actions/blurfast');
+    require('./actions/brightness');
+    require('./actions/coloradjust');
+    require('./actions/colorhistogram');
+    require('./actions/crop');
+    require('./actions/desaturate');
+    require('./actions/edges');
+    require('./actions/edges2');
+    require('./actions/emboss');
+    require('./actions/flip');
+    require('./actions/fliph');
+    require('./actions/flipv');
+    require('./actions/glow');
+    require('./actions/histogram');
+    require('./actions/hsl');
+    require('./actions/invert');
+    require('./actions/laplace');
+    require('./actions/lighten');
+    require('./actions/mosaic');
+    require('./actions/noise');
+    require('./actions/pointillize');
+    require('./actions/posterize');
+    require('./actions/removenoise');
+    require('./actions/resize');
+    require('./actions/rotate');
+    require('./actions/sepia');
+    require('./actions/sharpen');
+    require('./actions/solarize');
+    require('./actions/unsharpmask');
+}
