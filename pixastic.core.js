@@ -245,25 +245,27 @@ Pixastic = (function() {
 				h = img.height;
 			}
 
-			// offsetWidth/Height might be 0 if the image is not in the document
-			if (w == 0 || h == 0) {
-				if (img.parentNode == null) {
-					// add the image to the doc (way out left), read its dimensions and remove it again
-					var oldpos = img.style.position;
-					var oldleft = img.style.left;
-					img.style.position = "absolute";
-					img.style.left = "-9999px";
-					document.body.appendChild(img);
-					w = img.offsetWidth;
-					h = img.offsetHeight;
-					document.body.removeChild(img);
-					img.style.position = oldpos;
-					img.style.left = oldleft;
-				} else {
-					if (Pixastic.debug) writeDebug("Image has 0 width and/or height.");
-					return;
-				}
-			}
+            if (!Pixastic.Client.isNode()) {
+                // offsetWidth/Height might be 0 if the image is not in the document
+                if (w == 0 || h == 0) {
+                    if (img.parentNode == null) {
+                        // add the image to the doc (way out left), read its dimensions and remove it again
+                        var oldpos = img.style.position;
+                        var oldleft = img.style.left;
+                        img.style.position = "absolute";
+                        img.style.left = "-9999px";
+                        document.body.appendChild(img);
+                        w = img.offsetWidth;
+                        h = img.offsetHeight;
+                        document.body.removeChild(img);
+                        img.style.position = oldpos;
+                        img.style.left = oldleft;
+                    } else {
+                        if (Pixastic.debug) writeDebug("Image has 0 width and/or height.");
+                        return;
+                    }
+                }
+            }
 
 			if (actionName.indexOf("(") > -1) {
 				var tmp = actionName;
@@ -434,8 +436,9 @@ Pixastic = (function() {
 
 		revert : function(img) {
 			if (Pixastic.Client.hasCanvas()) {
-				if ((Pixastic.Client.isNode() && img.__pixastic_org_image)
-                || (img.tagName.toLowerCase() == "canvas" && img.__pixastic_org_image)) {
+				if ((Pixastic.Client.isNode()
+                ||   img.tagName.toLowerCase() == "canvas")
+                &&  img.__pixastic_org_image) {
 					img.width = img.__pixastic_org_width;
 					img.height = img.__pixastic_org_height;
 					img.getContext("2d").drawImage(img.__pixastic_org_image, 0, 0);
