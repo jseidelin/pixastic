@@ -29,7 +29,7 @@ Pixastic.Actions.blurfast = {
 			copy.width = smallWidth;
 			copy.height = smallHeight;
 
-			var clear = false;
+			var clear = true;
 			var steps = Math.round(amount * 20);
 
 			var copyCtx = copy.getContext("2d");
