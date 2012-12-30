@@ -9,13 +9,14 @@ if (typeof jQuery != "undefined" && jQuery && jQuery.fn) {
 		var newElements = [];
 		this.each(
 			function () {
+				var newOptions = jQuery.extend({}, options);
 				if (this.tagName.toLowerCase() == "img" && !this.complete) {
 					return;
 				}
 				if (action === "revert") {
 					var res = Pixastic.revert(this);
 				} else {
-					var res = Pixastic.process(this, action, options);
+					var res = Pixastic.process(this, action, newOptions);
 				}
 				if (res) {
 					newElements.push(res);
