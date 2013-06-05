@@ -21,17 +21,18 @@
         }
     }
     
-    function Pixastic(ctx) {
+    function Pixastic(ctx, workerControlPath) {
 
         var P = {},
             width = ctx.canvas.width, 
             height = ctx.canvas.height,
-            queue = [];
-            
+            queue = [],
+            workerControlPath = workerControlPath || "";
+
         if (!worker) {
             if (typeof window.Worker != "undefined") {
                 try {
-                    worker = new window.Worker("pixastic.worker.control.js");
+                    worker = new window.Worker(workerControlPath + "pixastic.worker.control.js");
                 } catch(e) {
                     if (location.protocol == "file:") {
                         Pixastic.log("Could not create real worker, running from file://")
