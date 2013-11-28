@@ -1184,8 +1184,45 @@ Pixastic.Effects = (function() {
                     }
                 }
             }
+        },
+
+        mosaic : function(inData, outData, width, height, options, progress) {
+
+            var blockSize = clamp(options.blockSize, 1, Math.max(width, height)),
+                yBlocks = Math.ceil(height / blockSize),
+                xBlocks = Math.ceil(width / blockSize),
+                y0, y1, x0, x1, idx, pidx,
+                n = yBlocks * xBlocks,
+                prog, lastProg = 0;
+
+            for (i=0, y0=0, bidx=0;i<yBlocks;i++) {
+                y1 = clamp(y0 + blockSize, 0, height);
+                for(j=0, x0=0;j<xBlocks;j++,bidx++) {
+                    x1 = clamp(x0 + blockSize, 0, width);
+
+                    idx = (y0 * width + x0) << 2;
+                    var r = inData[idx], g = inData[idx+1], b = inData[idx+2];
+
+                    for(bi=y0;bi<y1;bi++) {
+                        for(bj=x0;bj<x1;bj++) {
+                            pidx = (bi*width+bj) << 2;
+                            outData[pidx] = r, outData[pidx+1] = g, outData[pidx+2] = b;
+                            outData[pidx+3] = inData[pidx+3];
+                        }
+                    }
+
+                    x0 = x1;
+
+                    if (progress) {
+                        prog = (bidx/n*100 >> 0) / 100;
+                        if (prog > lastProg) {
+                            lastProg = progress(prog);
+                        }
+                    }
+                }
+                y0 = y1;
+            }
         }
-        
     };
 
 })();
