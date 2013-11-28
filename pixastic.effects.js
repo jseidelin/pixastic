@@ -1222,6 +1222,54 @@ Pixastic.Effects = (function() {
                 }
                 y0 = y1;
             }
+        },
+
+        equalize : function(inData, outData, width, height, options, progress) {
+            var n = width * height, p, i, level, ratio,
+                prog, lastProg;
+            var round = Math.round;
+            // build histogram
+            var pdf = new Array(256);
+            for (i=0;i<256;i++) {
+                pdf[i] = 0;
+            }
+
+            for (i=0;i<n;i++) {
+                p = i * 4;
+                level = clamp(round(inData[p] * 0.3 + inData[p+1] * 0.59 + inData[p+2] * 0.11), 0, 255);
+                outData[p+3] = level;
+                pdf[ level ]++;
+            }
+
+            // build cdf
+            var cdf = new Array(256);
+            cdf[0] = pdf[0];
+            for(i=1;i<256;i++) {
+                cdf[i] = cdf[i-1] + pdf[i];
+            }
+
+            // normalize cdf
+            for(i=0;i<256;i++) {
+                cdf[i] = cdf[i] / n * 255.0;
+            }
+
+            // map the pixel values
+            for (i=0;i<n;i++) {
+                p = i * 4;
+                level = outData[p+3];
+                ratio = cdf[level] / (level || 1);
+                outData[p] = clamp(round(inData[p] * ratio), 0, 255);
+                outData[p+1] = clamp(round(inData[p+1] * ratio), 0, 255);
+                outData[p+2] = clamp(round(inData[p+2] * ratio), 0, 255);
+                outData[p+3] = inData[p+3];
+
+                if (progress) {
+                    prog = (i/n*100 >> 0) / 100;
+                    if (prog > lastProg) {
+                        lastProg = progress(prog);
+                    }
+                }
+            }
         }
     };
 
