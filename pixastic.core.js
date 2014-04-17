@@ -217,7 +217,7 @@ var Pixastic = (function() {
 			var w = img.offsetWidth;
 			var h = img.offsetHeight;
 
-			if (imageIsCanvas) {
+			if (imageIsCanvas || (img.width && img.height)) {
 				w = img.width;
 				h = img.height;
 			}
