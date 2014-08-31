@@ -56,6 +56,7 @@ var Pixastic = (function() {
 			if (actions.length) {
 				if (el.tagName.toLowerCase() == "img") {
 					var dataImg = new Image();
+					if (el.crossOrigin) dataImg.crossOrigin = el.crossOrigin;
 					dataImg.src = el.src;
 					if (dataImg.complete) {
 						for (var a=0;a<actions.length;a++) {
@@ -381,6 +382,7 @@ var Pixastic = (function() {
 		process : function(img, actionName, options, callback) {
 			if (img.tagName.toLowerCase() == "img") {
 				var dataImg = new Image();
+				if (img.crossOrigin) dataImg.crossOrigin = img.crossOrigin;
 				dataImg.src = img.src;
 				if (dataImg.complete) {
 					var res = Pixastic.applyAction(img, dataImg, actionName, options);
