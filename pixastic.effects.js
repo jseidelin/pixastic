@@ -618,7 +618,7 @@ Pixastic.Effects = (function() {
         },
         
         convolve5x5 : function(inData, outData, width, height, options, progress) {
-            convolve3x3(inData, outData, width, height, options.kernel, progress);
+            convolve5x5(inData, outData, width, height, options.kernel, progress);
         },
         
         // A 3x3 high-pass filter

@@ -34,9 +34,9 @@
                     worker = new window.Worker("pixastic.worker.control.js");
                 } catch(e) {
                     if (location.protocol == "file:") {
-                        Pixastic.log("Could not create real worker, running from file://")
+                        Pixastic.log("Could not create native worker, running from file://")
                     } else {
-                        Pixastic.log("Could not create real worker.")
+                        Pixastic.log("Could not create native worker.")
                     }
                 }
             }
