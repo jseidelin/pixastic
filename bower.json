@@ -1,0 +1,16 @@
+{
+  "name": "pixastic",
+  "main": "pixastic.js",
+  "version": "0.2.0",
+  "homepage": "https://github.com/jmmerino/pixastic",
+  "authors": [
+    "Jacob Seidelin - http://pixastic.com/"
+  ],
+  "description": "JavaScript Image Processing Library",
+  "keywords": [
+    "pixastic",
+    "image",
+    "processing"
+  ],
+  "license": "MPL and GPL3.0"
+}
